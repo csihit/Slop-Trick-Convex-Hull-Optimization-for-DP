@@ -1,0 +1,6 @@
+INPUT
+Enter number of elements: 4
+Enter array elements: 1 3 5 10
+
+OUTPUT
+Minimum cost dp[n] = 33

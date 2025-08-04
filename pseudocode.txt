@@ -1,0 +1,47 @@
+DEFINE STRUCT Line:
+    VARIABLE m, c  // slope and intercept
+
+    CONSTRUCTOR(m, c):
+        SET self.m = m
+        SET self.c = c
+
+    FUNCTION eval(x):
+        RETURN m * x + c
+
+DEFINE CLASS ConvexHull:
+    LIST hull of Line
+
+    FUNCTION isBad(line1, line2, line3):
+        RETURN (line3.c - line1.c) * (line1.m - line2.m) <= (line2.c - line1.c) * (line1.m - line3.m)
+
+    FUNCTION addLine(m, c):
+        CREATE newLine with m and c
+        WHILE size of hull >= 2 AND isBad(hull[-2], hull[-1], newLine) IS TRUE:
+            REMOVE last line from hull
+        APPEND newLine to hull
+
+    FUNCTION query(x):
+        SET l = 0, r = size of hull - 1
+        WHILE l < r:
+            SET mid = (l + r) / 2
+            IF hull[mid].eval(x) <= hull[mid + 1].eval(x):
+                r = mid
+            ELSE:
+                l = mid + 1
+        RETURN hull[l].eval(x)
+
+MAIN FUNCTION:
+    INPUT n
+    INPUT array a of size n
+
+    INITIALIZE array dp of size n with all zeros
+    dp[0] = 0
+
+    CREATE ConvexHull object cht
+    cht.addLine(m = -2 * a[0], c = dp[0] + a[0] * a[0])
+
+    FOR i FROM 1 TO n - 1:
+        dp[i] = a[i] * a[i] + cht.query(a[i])
+        cht.addLine(m = -2 * a[i], c = dp[i] + a[i] * a[i])
+
+    OUTPUT "Minimum cost dp[n] = ", dp[n - 1]
